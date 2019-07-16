@@ -8,7 +8,7 @@ import SaccoTable from 'components/SaccoTable.jsx';
 import SaccoFilter from 'components/Filter/SaccoFilter.jsx';
 
 export default class SaccoList extends Component {
-  constructor(props) {      
+  constructor(props) {
     super(props);
     console.log(props);
 
