@@ -5,7 +5,7 @@ import axios from 'axios';
 import SaccoTable from './SaccoTable.jsx';
 
 export default class SaccoList extends Component {
-  constructor(props) {
+  constructor(props) {      
     super(props);
 
     this.state = { data: [] };
