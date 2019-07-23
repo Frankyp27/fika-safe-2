@@ -1,8 +1,37 @@
 import mongoose, { Schema } from 'mongoose';
 
+const bcrypt = require('bcrypt');
+
+
 
 // UNIQUE PROPERTY VALIDATOR
 const mongooseUniqueValidator = require('mongoose-unique-validator');
+
+// SUPER ADMIN SCHEMA
+const UserSchema = new Schema({
+  username: String,
+  password: String
+});
+
+// pre save functiion
+UserSchema.pre("save", function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  this.password = bcrypt.hashSync(this.password, 10);
+  next();
+});
+
+// compare passwords
+UserSchema.methods.comparePassword = function (plaintext, callback) {
+  return callback(null, bcrypt.compareSync(plaintext, this.password));
+};
+
+UserSchema.methods.comparePassword = (plaintext, callback) => { };
+
+
+
+
 
 // SCHEMA BLUEPRINTS
 const saccoSchema = new Schema({
@@ -33,6 +62,11 @@ const saccoSchema = new Schema({
       unique: true,
     },
   },
+  membership: Number,
+  date_founded: {
+    type: Date,
+    required: true
+  },
 
   about: {
     description: String,
@@ -51,9 +85,11 @@ const saccoSchema = new Schema({
     default: new Date(),
   },
   status: 'string',
+  username: { type: String, required: true, index: { unique: true } },
+  password: { type: String, required: true }
   // ....
 
-});
+}, { strict: false });
 
 // RIDER SCHEMA
 const riderSchema = new Schema({
@@ -143,7 +179,7 @@ const riderSchema = new Schema({
     ref: 'Sacco',
   },
 
-});
+}, { strict: false });
 // USING PLUGINS T
 saccoSchema.plugin(mongooseUniqueValidator);
 riderSchema.plugin(mongooseUniqueValidator);
@@ -152,6 +188,7 @@ riderSchema.plugin(mongooseUniqueValidator);
 // THIS CAN ALSO BE EXPORTED TO ANOTHER MODULARISED FILE
 const Sacco = mongoose.model('Sacco', saccoSchema);
 const Rider = mongoose.model('Rider', riderSchema);
+const UserModel = mongoose.model("user", UserSchema);
 
 // ++INSERTING SOME DATA INTO THE DATABASE++
 
@@ -159,4 +196,5 @@ const Rider = mongoose.model('Rider', riderSchema);
 module.exports = {
   Sacco,
   Rider,
+  UserModel
 };
